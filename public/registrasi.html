@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi IP - Manajemen IP</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Registrasi IP</h1>
+        <div class="card">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="register-ip">IP Address:</label>
+                    <input type="text" id="register-ip" name="ip" required>
+                </div>
+                <button type="submit">Daftarkan IP</button>
+            </form>
+            <div id="register-message" class="message" style="display: none;"></div>
+        </div>
+    </div>
+    <script>
+    const registerForm = document.getElementById('registerForm');
+
+    // Fungsi untuk mengaktifkan/menonaktifkan efek loading pada tombol
+    function toggleLoading(button, isLoading) {
+        if (isLoading) {
+            button.textContent = 'Memproses...';
+            button.disabled = true;
+        } else {
+            button.textContent = 'Daftarkan IP'; // Ganti dengan teks asli tombol
+            button.disabled = false;
+        }
+    }
+
+    async function submitForm(url, formId) {
+        const form = document.getElementById(formId);
+        const button = form.querySelector('button');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // Mengaktifkan efek loading
+        toggleLoading(button, true);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: result.message || 'Pendaftaran IP berhasil.'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: result.message || 'IP sudah terdaftar atau terjadi kesalahan.'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Terjadi kesalahan pada koneksi atau server.'
+            });
+        } finally {
+            // Menonaktifkan efek loading setelah proses selesai (baik berhasil atau gagal)
+            toggleLoading(button, false);
+        }
+    }
+
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitForm('/api/register', 'registerForm');
+    });
+</script>
+</body>
+</html>
