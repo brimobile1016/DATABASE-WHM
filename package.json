@@ -1,0 +1,21 @@
+{
+  "name": "manajemen-ip",
+  "version": "1.0.0",
+  "description": "Sistem manajemen IP dengan Vercel KV",
+  "main": "pages/api/check.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel start"
+  },
+  "keywords": [
+    "vercel",
+    "serverless",
+    "kv",
+    "redis"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/kv": "^1.0.1"
+  }
+}
