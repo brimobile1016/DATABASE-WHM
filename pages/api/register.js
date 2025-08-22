@@ -1,4 +1,7 @@
-import { kv } from '@vercel/kv';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import creds from '../../creds.json'; // Pastikan path ini benar!
+
+const SPREADSHEET_ID = 'GANTI_DENGAN_ID_GOOGLE_SHEET_ANDA';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -11,22 +14,37 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'IP dan masa berlaku diperlukan.' });
   }
 
-  const daysInSeconds = parseInt(days, 10) * 24 * 60 * 60;
-  const now = new Date();
-  const expirationDate = new Date(now.getTime() + daysInSeconds * 1000);
-
   try {
-    const ipData = {
-      registered_at: now.toISOString(), // Tanggal registrasi
-      expires_at: expirationDate.toISOString() // Tanggal kadaluarsa
-    };
+    const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
+    const sheet = doc.sheetsByIndex[0];
 
-    // Gunakan Vercel KV's 'EX' untuk otomatis menghapus setelah waktu tertentu
-    await kv.set(ip, ipData, { ex: daysInSeconds });
+    // Cek apakah IP sudah ada
+    const rows = await sheet.getRows();
+    const existingRow = rows.find(row => row.IP_Address === ip);
+
+    if (existingRow) {
+      return res.status(409).json({ message: `IP ${ip} sudah terdaftar.` });
+    }
     
+    // Hitung tanggal kedaluwarsa
+    const now = new Date();
+    const daysToAdd = parseInt(days, 10);
+    const expirationDate = new Date();
+    expirationDate.setDate(now.getDate() + daysToAdd);
+
+    // Tambahkan baris baru ke sheet
+    const newRow = await sheet.addRow({
+      IP_Address: ip,
+      Registered_At: now.toLocaleString('id-ID'),
+      Expired_At: expirationDate.toLocaleString('id-ID')
+    });
+
     return res.status(200).json({
       status: 'success',
-      message: `IP ${ip} berhasil didaftarkan. Berlaku hingga ${expirationDate.toLocaleString('id-ID')}.`,
+      message: `IP ${ip} berhasil didaftarkan. Berlaku hingga ${newRow.Expired_At}.`,
+      data: newRow,
     });
   } catch (error) {
     console.error(error);
