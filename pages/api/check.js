@@ -1,7 +1,7 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import creds from '../../creds.json'; // Pastikan path ini benar!
 
-const SPREADSHEET_ID = 'GANTI_DENGAN_ID_GOOGLE_SHEET_ANDA';
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
