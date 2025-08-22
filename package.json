@@ -7,19 +7,14 @@
     "dev": "vercel dev",
     "start": "vercel start"
   },
-  "dependencies": {
-    "google-spreadsheet": "^4.1.2"
-  }
-},
   "keywords": [
     "vercel",
     "serverless",
-    "kv",
-    "redis"
+    "google-sheet"
   ],
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
-    "@vercel/kv": "^1.0.1"
+    "google-spreadsheet": "^4.1.2"
   }
 }
