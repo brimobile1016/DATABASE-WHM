@@ -1,4 +1,7 @@
-import { kv } from '@vercel/kv';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import creds from '../../creds.json'; // Pastikan path ini benar!
+
+const SPREADSHEET_ID = 'GANTI_DENGAN_ID_GOOGLE_SHEET_ANDA';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,9 +15,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const deleted = await kv.del(ip);
-    
-    if (deleted > 0) {
+    const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
+    const sheet = doc.sheetsByIndex[0];
+
+    const rows = await sheet.getRows();
+    const rowToDelete = rows.find(row => row.IP_Address === ip);
+
+    if (rowToDelete) {
+      await rowToDelete.delete();
       return res.status(200).json({
         status: 'success',
         message: `IP ${ip} berhasil dihapus.`,
@@ -22,7 +32,7 @@ export default async function handler(req, res) {
     } else {
       return res.status(404).json({
         status: 'not_found',
-        message: `IP ${ip} tidak ditemukan, tidak ada yang dihapus.`,
+        message: `IP ${ip} tidak ditemukan.`,
       });
     }
   } catch (error) {
