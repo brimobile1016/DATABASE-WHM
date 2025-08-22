@@ -2,19 +2,14 @@
   "name": "manajemen-ip",
   "version": "1.0.0",
   "description": "Sistem manajemen IP dengan Google Sheet",
-  "main": "pages/api/check.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "vercel start"
+    "start": "node --no-warnings server.js"
   },
-  "keywords": [
-    "vercel",
-    "serverless",
-    "google-sheet"
-  ],
-  "author": "Your Name",
-  "license": "ISC",
   "dependencies": {
-    "google-spreadsheet": "^4.1.2"
+    "body-parser": "^1.20.2",
+    "dotenv": "^17.2.1",
+    "express": "^4.19.2",
+    "google-spreadsheet": "^3.3.0"
   }
 }
