@@ -8,17 +8,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { ip, days } = req.body;
+  const { ip } = req.body;
 
-  if (!ip || !days) {
-    return res.status(400).json({ message: 'IP dan masa berlaku diperlukan.' });
+  if (!ip) {
+    return res.status(400).json({ message: 'IP address diperlukan.' });
   }
 
   try {
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
-    const sheet = doc.sheetsByIndex[0];
+    const sheet = doc.sheetsByIndex[0]; // Asumsikan data berada di sheet pertama
 
     // Cek apakah IP sudah ada
     const rows = await sheet.getRows();
@@ -28,11 +28,10 @@ export default async function handler(req, res) {
       return res.status(409).json({ message: `IP ${ip} sudah terdaftar.` });
     }
     
-    // Hitung tanggal kedaluwarsa
+    // Hitung tanggal kedaluwarsa secara otomatis (7 hari dari sekarang)
     const now = new Date();
-    const daysToAdd = parseInt(days, 10);
     const expirationDate = new Date();
-    expirationDate.setDate(now.getDate() + daysToAdd);
+    expirationDate.setDate(now.getDate() + 7); // Tambahkan 7 hari
 
     // Tambahkan baris baru ke sheet
     const newRow = await sheet.addRow({
