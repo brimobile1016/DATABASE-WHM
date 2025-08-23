@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('./creds');
+const creds = JSON.parse(process.env.GOOGLE_CLOUD_PRIVATE_KEY);
 
  const app = express();
 // const port = 3000;
@@ -151,3 +151,4 @@ app.post('/api/delete', async (req, res) => {
 //});
 
 module.exports = app;
+
