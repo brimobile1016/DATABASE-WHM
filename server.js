@@ -3,11 +3,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-// const creds = require('./creds.json'); // Pastikan path ini benar!
-const creds = JSON.parse(process.env.GOOGLE_CREDS);
+const creds = require('./creds');
 
-const app = express();
-const port = 3000;
+ const app = express();
+// const port = 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -18,6 +17,9 @@ const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 // Fungsi untuk mendapatkan sheet
 const getSheet = async () => {
+    if (!SPREADSHEET_ID) {
+        throw new Error('SPREADSHEET_ID not found in .env file.');
+    }
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
@@ -51,14 +53,14 @@ app.post('/api/check', async (req, res) => {
 
         if (foundRow) {
             return res.status(200).json({
-    status: 'found',
-    message: `IP ${ip} ditemukan. Kadaluarsa pada ${foundRow.Expired_At}.`,
-    data: {
-        IP_Address: foundRow.IP_Address,
-        Registered_At: foundRow.Registered_At,
-        Expired_At: foundRow.Expired_At,
-    }, // <-- Kirim hanya data yang diperlukan
-});
+                status: 'found',
+                message: `IP ${ip} ditemukan. Kadaluarsa pada ${foundRow.Expired_At}.`,
+                data: {
+                    IP_Address: foundRow.IP_Address,
+                    Registered_At: foundRow.Registered_At,
+                    Expired_At: foundRow.Expired_At,
+                },
+            });
         } else {
             return res.status(404).json({
                 status: 'not_found',
@@ -75,13 +77,11 @@ app.post('/api/check', async (req, res) => {
 app.post('/api/register', async (req, res) => {
     const { ip } = req.body;
 
-    // Regex untuk memvalidasi format IP (IPv4)
     const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
-    // Lakukan validasi IP
     if (!ipRegex.test(ip)) {
-        return res.status(400).json({ 
-            message: `Alamat IP "${ip}" tidak valid. Mohon masukkan format IP yang benar.` 
+        return res.status(400).json({
+            message: `Alamat IP "${ip}" tidak valid. Mohon masukkan format IP yang benar.`
         });
     }
 
@@ -146,7 +146,8 @@ app.post('/api/delete', async (req, res) => {
 });
 
 // Jalankan server
-app.listen(port, () => {
-    console.log(`Server berjalan di http://localhost:${port}`);
+//app.listen(port, () => {
+//    console.log(`Server berjalan di http://localhost:${port}`);
+//});
 
-});
+module.exports = app;
