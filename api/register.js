@@ -1,6 +1,6 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import creds from '../../creds.json';
 
+const creds = JSON.parse(process.env.GOOGLE_CREDS);
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 const getSheet = async () => {
@@ -11,13 +11,9 @@ const getSheet = async () => {
 };
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Method Not Allowed' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ message: 'Method Not Allowed' });
 
     const { ip } = req.body;
-
-    // Validasi IP
     const ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     if (!ipRegex.test(ip)) return res.status(400).json({ message: 'IP tidak valid' });
 
@@ -48,7 +44,7 @@ export default async function handler(req, res) {
             },
         });
     } catch (error) {
-        console.error(error);
+        console.error('Error register:', error);
         return res.status(500).json({ message: 'Kesalahan Server Internal' });
     }
 }
