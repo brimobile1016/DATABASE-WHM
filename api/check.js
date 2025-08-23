@@ -34,6 +34,6 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Error check:', error);
-    return res.status(500).json({ message: 'Kesalahan Server Internal' });
+    return res.status(500).json({ message: 'Kesalahan Server Internal', error: error.message });
   }
 }
