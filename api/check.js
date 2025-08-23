@@ -1,7 +1,7 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-const creds = "./../creds.json';
-const SPREADSHEET_ID = '1JZtcHiOCbwEzRLtX6leTLa1pfRm4hgEOyhcgcuQ3Hs4';
+const creds = JSON.parse(process.env.GOOGLE_CREDS); // <-- pakai ENV variable
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;   // <-- pakai ENV variable
 
 const getSheet = async () => {
   const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
