@@ -3,7 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const creds = require('./creds.json'); // Pastikan path ini benar!
+// const creds = require('./creds.json'); // Pastikan path ini benar!
+const creds = JSON.parse(process.env.GOOGLE_CREDS);
 
 const app = express();
 const port = 3000;
@@ -147,4 +148,5 @@ app.post('/api/delete', async (req, res) => {
 // Jalankan server
 app.listen(port, () => {
     console.log(`Server berjalan di http://localhost:${port}`);
+
 });
